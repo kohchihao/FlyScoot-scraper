@@ -2,6 +2,8 @@
 const osmosis = require("osmosis")
 const chalk = require('chalk')
 const chalkRainbow = require('chalk-rainbow')
+const Telegraf = require('telegraf')
+const tele = new Telegraf(process.env.APOLLO_BOT_TOKEN)
 
 var prevLowestOutboundFare=0
 var prevLowestReturnFare=0
@@ -17,19 +19,19 @@ const fares = {
 	return: []
 }
 
-var interval = 30 // In minutes
+var interval = 30 // In minutes // check every x miniutes
 
 const fetch = () => {
    osmosis
      .get("http://makeabooking.flyscoot.com/Book")
      .submit(".form-booking__multi", {
      	"revAvailabilitySearch.SearchInfo.Direction" : "Multicity",
-     	"revAvailabilitySearch.SearchInfo.SearchStations[0].DepartureStationCode" : "SIN",
+     	"revAvailabilitySearch.SearchInfo.SearchStations[0].DepartureStationCode" : "SIN", //country code
      	"revAvailabilitySearch.SearchInfo.SearchStations[0].ArrivalStationCode" : "DMK",
-     	"revAvailabilitySearch.SearchInfo.SearchStations[0].DepartureDate" : "01/01/2017",
+     	"revAvailabilitySearch.SearchInfo.SearchStations[0].DepartureDate" : "01/01/2017", // mm/dd/yyyy
      	"revAvailabilitySearch.SearchInfo.SearchStations[1].DepartureStationCode" : "DMK",
      	"revAvailabilitySearch.SearchInfo.SearchStations[1].ArrivalStationCode" : "SIN",
-		"revAvailabilitySearch.SearchInfo.SearchStations[1].DepartureDate" : "01/06/2017",
+		"revAvailabilitySearch.SearchInfo.SearchStations[1].DepartureDate" : "01/06/2017", // mm/dd/yyyy
 		"revAvailabilitySearch.SearchInfo.AdultCount" : "2",
 		"revAvailabilitySearch.SearchInfo.ChildrenCount" : "0"
 
@@ -55,9 +57,10 @@ const fetch = () => {
  	    const outboundFareDiff = prevLowestOutboundFare - lowestOutboundFare
  	    const returnFareDiff = prevLowestReturnFare - lowestReturnFare
  	    
- 	    if(lowestOutboundFare <= 50 && lowestReturnFare <= 50){
+ 	    if(lowestOutboundFare <= 100 && lowestReturnFare <= 100){ 
  	    	
  	    	console.log(chalkRainbow("DEAL ALERT!!!! " + lowestOutboundFare +","+lowestReturnFare))
+            tele.telegram.sendMessage('<Your telegram ID>',"DEAL ALERT!!!" + "The lowest outbound fare is $"  + lowestOutboundFare + ", the lowest return fare is $" + lowestReturnFare)
 
  	    }
 
